@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Send } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
@@ -76,7 +75,7 @@ const MessageInterface = () => {
   };
 
   return (
-    <div className="w-full max-w-2xl h-[600px] flex flex-col">
+    <main className="w-full h-[600px] flex flex-col">
       <ScrollArea className="h-[700px] w-full p-4">
         <div className="space-y-4">
           {messages.map((message) => (
@@ -87,12 +86,12 @@ const MessageInterface = () => {
               }`}
             >
               {message.sender === "other" ? (
-                <div className="rounded-full bg-red-400 w-10 h-10"></div>
+                <div className="rounded-full bg-emerald-800 w-10 h-10"></div>
               ) : null}
               <div
                 className={`max-w-[80%] rounded-lg p-3 ${
                   message.sender === "user"
-                    ? "bg-blue-500 text-white rounded-tr-none"
+                    ? "bg-emerald-200 text-gray-900 rounded-tr-none"
                     : "bg-gray-100 text-gray-900 rounded-tl-none"
                 }`}
               >
@@ -125,7 +124,7 @@ const MessageInterface = () => {
           </Button>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

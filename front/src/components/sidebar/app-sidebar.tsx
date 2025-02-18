@@ -1,4 +1,4 @@
-import { Calendar, Home, Search, Settings, SendHorizontal } from "lucide-react"
+import { Calendar, Home, Search, Settings, SendHorizontal } from "lucide-react";
 
 import {
   Sidebar,
@@ -6,21 +6,24 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { Button } from "../ui/button";
+import { useNavigate, NavLink } from "react-router-dom";
 
 // Menu items.
 const items = [
   {
     title: "Home",
-    url: "#",
+    url: "/",
     icon: Home,
   },
   {
     title: "Chat",
-    url: "#",
+    url: "/chat",
     icon: SendHorizontal,
   },
   {
@@ -38,11 +41,16 @@ const items = [
     url: "#",
     icon: Settings,
   },
-]
+];
 
 export function AppSidebar() {
+  const navigate = useNavigate();
+
   return (
     <Sidebar>
+      <SidebarHeader>
+      <Button onClick={() => navigate("/login")}>Connexion</Button>
+      </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel>Application</SidebarGroupLabel>
@@ -51,10 +59,17 @@ export function AppSidebar() {
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <a href={item.url} className="hover:bg-emerald-200">
+                    <NavLink
+                      to={item.url}
+                      className={({ isActive }: {isActive: boolean}) =>
+                        `hover:bg-emerald-200 ${
+                          isActive ? "bg-emerald-200" : ""
+                        }`
+                      }
+                    >
                       <item.icon />
                       <span>{item.title}</span>
-                    </a>
+                    </NavLink>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -63,5 +78,5 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
-  )
+  );
 }
