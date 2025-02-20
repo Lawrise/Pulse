@@ -1,4 +1,4 @@
-import { Calendar, Home, Search, Settings, SendHorizontal } from "lucide-react";
+import { Calendar, Home, Search, Settings, SendHorizontal, Users } from "lucide-react";
 
 import {
   Sidebar,
@@ -11,8 +11,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { Button } from "../ui/button";
 import { useNavigate, NavLink } from "react-router-dom";
+import { useAuth } from "@/context/authContext";
+import SidebarHeaderProfile from "./sidebarHeader";
 
 // Menu items.
 const items = [
@@ -25,6 +26,11 @@ const items = [
     title: "Chat",
     url: "/chat",
     icon: SendHorizontal,
+  },
+  {
+    title: "Friends",
+    url: "/friends",
+    icon: Users,
   },
   {
     title: "Calendar",
@@ -45,11 +51,17 @@ const items = [
 
 export function AppSidebar() {
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
 
   return (
-    <Sidebar>
+    <Sidebar variant="sidebar" collapsible="icon" className="bg-emerald-50">
       <SidebarHeader>
-      <Button onClick={() => navigate("/login")}>Connexion</Button>
+      <SidebarHeaderProfile 
+        user={user} 
+        navigate={navigate} 
+        logout={logout} 
+      />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -57,11 +69,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} className="hover:bg-emerald-100 rounded-md">
                   <SidebarMenuButton asChild>
                     <NavLink
                       to={item.url}
-                      className={({ isActive }: {isActive: boolean}) =>
+                      className={({ isActive }: { isActive: boolean }) =>
                         `hover:bg-emerald-200 ${
                           isActive ? "bg-emerald-200" : ""
                         }`

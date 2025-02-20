@@ -17,7 +17,27 @@ CREATE TABLE debates (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE chats (
+  id SERIAL PRIMARY KEY,
+  user1_id INT NOT NULL,
+  user2_id INT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_user1 FOREIGN KEY (user1_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT fk_user2 FOREIGN KEY (user2_id) REFERENCES users(id) ON DELETE CASCADE,
+  CONSTRAINT unique_users UNIQUE (user1_id, user2_id) -- Unicité d'une conversation
+);
+
 CREATE TABLE messages (
+  id SERIAL PRIMARY KEY,
+  chat_id INT NOT NULL,
+  sender_id INT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_chat FOREIGN KEY (chat_id) REFERENCES chats(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sender FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+CREATE TABLE debate_messages (
     id SERIAL PRIMARY KEY,
     debate_id INT REFERENCES debates(id) ON DELETE CASCADE,
     user_id INT REFERENCES users(id) ON DELETE SET NULL,

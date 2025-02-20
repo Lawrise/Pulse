@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
+import { useAuth } from "@/context/authContext";
+import { io, Socket } from "socket.io-client";
 
 interface Message {
   id: string;
@@ -11,117 +13,141 @@ interface Message {
   timestamp: Date;
 }
 
-const MessageData: Message[] = [
-  {
-    id: "1",
-    content: "Hi there!",
-    sender: "other",
-    timestamp: new Date(Date.now() - 1000000),
-  },
-  {
-    id: "2",
-    content: "Hello! How can I help you today?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 900000),
-  },
-  {
-    id: "3",
-    content: "I was wondering if you could tell me more about your services.",
-    sender: "other",
-    timestamp: new Date(Date.now() - 800000),
-  },
-  {
-    id: "4",
-    content: "Of course! We offer a wide range of services including...",
-    sender: "user",
-    timestamp: new Date(Date.now() - 700000),
-  },
-  {
-    id: "5",
-    content: "That sounds great! Can you provide more details?",
-    sender: "other",
-    timestamp: new Date(Date.now() - 600000),
-  },
-  {
-    id: "6",
-    content: "Sure, I'd be happy to. What specifically are you interested in?",
-    sender: "user",
-    timestamp: new Date(Date.now() - 500000),
-  },
-];
+interface Chat {
+  chat_id: number;
+  other_user_id: number;
+  message: string;
+  created_at: string;
+}
 
 const MessageInterface = () => {
-  const [messages, setMessages] = useState<Message[]>(MessageData);
+  const { user } = useAuth();
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState("");
+  const [selectedChat, setSelectedChat] = useState<number | null>(null);
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [socket, setSocket] = useState<Socket | null>(null);
 
-  const handleSend = (sender: "user" | "other") => {
-    if (newMessage.trim()) {
-      const message: Message = {
-        id: Date.now().toString(),
-        content: newMessage,
-        sender: sender,
-        timestamp: new Date(),
-      };
-      setMessages([...messages, message]);
-      setNewMessage("");
+  useEffect(() => {
+    if (!user?.id) return;
+    const fetchChats = async () => {
+      try {
+        const res = await fetch(`http://localhost:3000/conv/chats/${user.id}`);
+        if (!res.ok) throw new Error("Failed to fetch chats");
+        const data = await res.json();
+        setChats(data);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchChats();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const newSocket = io("http://localhost:3000", {
+      withCredentials: true,
+      transports: ["websocket", "polling"],
+    });
+    setSocket(newSocket);
+
+    newSocket.on("receive_message", (message: Message) => {
+      setMessages((prev) => [...prev, message]);
+    });
+
+    return () => {
+      newSocket.disconnect();
+    };
+  }, []);
+
+  const openChat = async (chatId: number) => {
+    setSelectedChat(chatId);
+    try {
+      const res = await fetch(`http://localhost:3000/conv/messages/${chatId}`);
+      if (!res.ok) throw new Error("Failed to fetch messages");
+      const data = await res.json();
+      setMessages(data);
+      socket?.emit("join_chat", chatId);
+    } catch (error) {
+      console.error(error);
     }
+  };
+
+  const sendMessage = () => {
+    if (!selectedChat || !newMessage.trim()) return;
+
+    const messageData = {
+      chatId: selectedChat,
+      senderId: user?.id,
+      message: newMessage,
+    };
+    socket?.emit("send_message", messageData);
+    setNewMessage("");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSend("user");
+      sendMessage();
     }
   };
 
   return (
-    <main className="w-full h-[600px] flex flex-col">
-      <ScrollArea className="h-[700px] w-full p-4">
-        <div className="space-y-4">
-          {messages.map((message) => (
-            <div
-              key={message.id}
-              className={`flex gap-2 ${
-                message.sender === "user" ? "flex-row-reverse" : "justify-start"
-              }`}
-            >
-              {message.sender === "other" ? (
-                <div className="rounded-full bg-emerald-800 w-10 h-10"></div>
-              ) : null}
+    <main className="w-full h-full flex">
+      <div className="w-1/4 border-r-2">
+        {chats.map((chat) => (
+          <div key={chat.chat_id} onClick={() => openChat(chat.chat_id)}>
+            <p>
+              <strong>Chat with User {chat.other_user_id}</strong>
+            </p>
+            <p>{chat.message || "No messages yet..."}</p>
+            <hr />
+          </div>
+        ))}
+      </div>
+      <div className="flex flex-col w-3/4">
+        <ScrollArea className="h-[700px] w-full p-4">
+          <div className="space-y-4">
+            {messages.map((message) => (
               <div
-                className={`max-w-[80%] rounded-lg p-3 ${
+                key={message.id}
+                className={`flex gap-2 ${
                   message.sender === "user"
-                    ? "bg-emerald-200 text-gray-900 rounded-tr-none"
-                    : "bg-gray-100 text-gray-900 rounded-tl-none"
+                    ? "flex-row-reverse"
+                    : "justify-start"
                 }`}
               >
-                <p className="break-words">{message.content}</p>
-                <span className="text-xs opacity-70 mt-1 block">
-                  {`seen at ${message.timestamp.toLocaleTimeString()}`}
-                </span>
+                {message.sender === "other" && (
+                  <div className="rounded-full bg-emerald-800 w-10 h-10"></div>
+                )}
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.sender === "user"
+                      ? "bg-emerald-200 text-gray-900 rounded-tr-none"
+                      : "bg-gray-100 text-gray-900 rounded-tl-none"
+                  }`}
+                >
+                  <p className="break-words">{message.content}</p>
+                  <span className="text-xs opacity-70 mt-1 block">
+                    {`seen at ${message.timestamp.toLocaleTimeString()}`}
+                  </span>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-      <div className="border-t p-4">
-        <div className="flex gap-2">
-          <Input
-            value={newMessage}
-            onChange={(e) => setNewMessage(e.target.value)}
-            onKeyDown={handleKeyPress}
-            placeholder="Type a message..."
-            className="flex-grow"
-          />
-          <Button onClick={() => handleSend("user")} className="px-4">
-            <Send className="h-4 w-4" />
-          </Button>
-          <Button
-            onClick={() => handleSend("other")}
-            className="px-4 bg-amber-700"
-          >
-            <Send className="h-4 w-4" />
-          </Button>
+            ))}
+          </div>
+        </ScrollArea>
+        <div className="border-t p-4">
+          <div className="flex gap-2">
+            <Input
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              onKeyDown={handleKeyPress}
+              placeholder="Type a message..."
+              className="flex-grow"
+            />
+            <Button onClick={sendMessage} className="px-4">
+              <Send className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
     </main>

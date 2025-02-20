@@ -1,7 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const authenticateToken = require("../middleware/authMiddleware");
-const pool = require("../config/db")
+const pool = require("../config/db");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 router.post("/register", async (req, res) => {
   try {
@@ -27,7 +29,7 @@ router.post("/register", async (req, res) => {
 
     // Insert user
     const result = await pool.query(
-      "INSERT INTO users (email, password) VALUES ($1, $2) RETURNING id, email",
+      "INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email",
       [email, hashedPassword]
     );
 
@@ -63,7 +65,7 @@ router.post("/login", async (req, res) => {
     }
 
     // Check password
-    const validPassword = await bcrypt.compare(password, user.password);
+    const validPassword = await bcrypt.compare(password, user.password_hash);
 
     if (!validPassword) {
       return res.status(401).json({ error: "Invalid credentials" });
@@ -90,6 +92,10 @@ router.post("/login", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
+router.post("/logout", async (req, res) => {
+  
+})
 
 // Protected route example
 router.get("/profile", authenticateToken, async (req, res) => {

@@ -1,21 +1,22 @@
 version: '3'
 services:
   db:
-    image: postgres:latest # Use the official PostgreSQL image
+    image: postgres:latest
     container_name: postgres-container
     environment:
       POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_HOST}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "5432:5432" # Expose the PostgreSQL port
+      - "5432:5432"
     volumes:
-      - postgres-data:/var/lib/postgresql/data # Store data persistently
+      - postgres-data:/var/lib/postgresql/data
+      - ./db/shcema.sql:/db/schema.sql
     networks:
       - mynetwork
 
 volumes:
-  postgres-data: # Named volume to persist database data
+  postgres-data:
 
 networks:
-  mynetwork: # Define the network so containers can communicate
+  mynetwork:

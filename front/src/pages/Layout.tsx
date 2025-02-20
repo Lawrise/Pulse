@@ -6,13 +6,14 @@ import Header from "@/components/header/header";
 
 const Layout: React.FC = () => {
   return (
-    <SidebarProvider>
-      <AppSidebar />
-	  <div className='w-full h-screen flex flex-col items-center'>
-        <Header />
-        <Outlet />
-      </div>
-    </SidebarProvider>
+    
+      <SidebarProvider>
+        <AppSidebar />
+        <div className="w-full h-screen flex flex-col items-center">
+          <Header />
+          <Outlet />
+        </div>
+      </SidebarProvider>
   );
 };
 
