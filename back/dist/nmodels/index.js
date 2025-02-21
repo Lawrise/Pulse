@@ -1,0 +1,11 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Friend = exports.Message = exports.Chat = exports.User = void 0;
+var userModel_1 = require("./userModel");
+Object.defineProperty(exports, "User", { enumerable: true, get: function () { return userModel_1.User; } });
+var chatModel_1 = require("./chatModel");
+Object.defineProperty(exports, "Chat", { enumerable: true, get: function () { return chatModel_1.Chat; } });
+var messageModel_1 = require("./messageModel");
+Object.defineProperty(exports, "Message", { enumerable: true, get: function () { return messageModel_1.Message; } });
+var friendModel_1 = require("./friendModel");
+Object.defineProperty(exports, "Friend", { enumerable: true, get: function () { return friendModel_1.Friend; } });

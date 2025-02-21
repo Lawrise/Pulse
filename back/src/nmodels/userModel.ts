@@ -1,47 +1,47 @@
-import {
-  Sequelize,
-  DataTypes,
-  Model,
-  InferAttributes,
-  InferCreationAttributes,
-  CreationOptional,
-} from "@sequelize/core";
-import {
-  Attribute,
-  PrimaryKey,
-  NotNull,
-  HasMany,
-} from "@sequelize/core/decorators-legacy";
-import { Friend } from "./friendModel";
-import { HasManyGetAssociationsMixin } from '@sequelize/core';
+import { Model, DataTypes, Optional } from "sequelize";
+import sequelize from "../config/db";
 
-export class User extends Model<
-  InferAttributes<User>,
-  InferCreationAttributes<User>
-> {
-  @Attribute(DataTypes.UUID)
-  @PrimaryKey
-  declare id: CreationOptional<string>;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare username: string;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare email: string;
-
-  @Attribute(DataTypes.STRING)
-  @NotNull
-  declare password: string;
-
-  @HasMany(() => Friend, 'userId')
-  declare friends?: Friend[];
-
-  @HasMany(() => Friend, {
-    foreignKey: 'userId', 
-    scope: { status: 'pending'}, 
-  })
-  declare pendingFriends?: Friend[];
-
+interface UserAttributes {
+  id: string;
+  username: string;
+  email: string;
+  password: string;
 }
+
+interface UserCreationAttributes extends Optional<UserAttributes, "id"> {}
+
+export class User extends Model<UserAttributes, UserCreationAttributes> {
+  declare id: string;
+  declare username: string;
+  declare email: string;
+  declare password: string;
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    username: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    modelName: "user",
+    timestamps: false,
+  }
+);
+
+export default User;

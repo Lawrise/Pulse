@@ -2,10 +2,10 @@
   "name": "back",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
     "start": "node dist/app.js",
-    "dev": "nodemon --exec ts-node src/app.js",
+    "dev": "nodemon --exec ts-node --files src/app.ts",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -14,8 +14,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@sequelize/core": "^7.0.0-alpha.42",
-    "@sequelize/postgres": "^7.0.0-alpha.45",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -33,6 +31,7 @@
     "@types/node": "^20.11.19",
     "nodemon": "^3.0.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "@types/sequelize": "^4.28.20"
   }
 }

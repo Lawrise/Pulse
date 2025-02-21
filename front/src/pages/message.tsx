@@ -5,6 +5,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/authContext";
 import { io, Socket } from "socket.io-client";
+import apiAxios from "@/services/api";
 
 interface Message {
   id: string;
@@ -32,9 +33,7 @@ const MessageInterface = () => {
     if (!user?.id) return;
     const fetchChats = async () => {
       try {
-        const res = await fetch(`http://localhost:3000/conv/chats/${user.id}`);
-        if (!res.ok) throw new Error("Failed to fetch chats");
-        const data = await res.json();
+        const { data } = await apiAxios.get(`/chats/${user.id}`);
         setChats(data);
       } catch (error) {
         console.error(error);
@@ -62,9 +61,7 @@ const MessageInterface = () => {
   const openChat = async (chatId: number) => {
     setSelectedChat(chatId);
     try {
-      const res = await fetch(`http://localhost:3000/conv/messages/${chatId}`);
-      if (!res.ok) throw new Error("Failed to fetch messages");
-      const data = await res.json();
+      const { data } = await apiAxios.get(`/chats/${chatId}`);
       setMessages(data);
       socket?.emit("join_chat", chatId);
     } catch (error) {

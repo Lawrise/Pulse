@@ -1,44 +1,53 @@
-import {
-  Sequelize,
-  DataTypes,
-  Model,
-  InferAttributes,
-  InferCreationAttributes,
-  CreationOptional,
-} from "@sequelize/core";
-import {
-  Attribute,
-  PrimaryKey,
-  BelongsTo,
-  NotNull,
-  Default,
-} from "@sequelize/core/decorators-legacy";
+import { Model, DataTypes, Optional } from "sequelize";
+import { sequelize } from "../config/db";
 import { User } from "./userModel";
 
-export class Friend extends Model<
-  InferAttributes<Friend>,
-  InferCreationAttributes<Friend>
-> {
-  @Attribute(DataTypes.UUID)
-  @PrimaryKey
-  declare id: CreationOptional<string>;
-
-  @Attribute(DataTypes.UUID)
-  @NotNull
-  declare userId: string;
-
-  @Attribute(DataTypes.UUID)
-  @NotNull
-  declare friendId: string;
-
-  @Attribute(DataTypes.ENUM("pending", "accepted", "rejected"))
-  @NotNull
-  @Default("pending")
-  declare status: CreationOptional<string>;
-
-  @BelongsTo(() => User, { foreignKey: "userId"})
-  declare user: User;
-
-  @BelongsTo(() => User, { foreignKey: "friendId"})
-  declare friend: User;
+export interface FriendAttributes {
+  id: string;
+  userId: string;
+  friendId: string;
+  status: "pending" | "accepted" | "rejected";
+  user?: User;
+  friendUser?: User;
 }
+
+export interface FriendCreationAttributes
+  extends Optional<FriendAttributes, "id" | "status"> {}
+
+export class Friend extends Model<FriendAttributes, FriendCreationAttributes> {
+  declare id: string;
+  declare userId: string;
+  declare friendId: string;
+  declare status: "pending" | "accepted" | "rejected";
+  declare user?: User;
+  declare friend?: User;
+}
+
+Friend.init(
+  {
+    id: {
+      type: DataTypes.UUID,
+      primaryKey: true,
+      defaultValue: DataTypes.UUIDV4,
+    },
+    userId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    friendId: {
+      type: DataTypes.UUID,
+      allowNull: false,
+    },
+    status: {
+      type: DataTypes.ENUM("pending", "accepted", "rejected"),
+      defaultValue: "pending",
+    },
+  },
+  {
+    sequelize,
+    modelName: "friend",
+    timestamps: false,
+  }
+);
+
+export default Friend;
