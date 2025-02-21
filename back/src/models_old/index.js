@@ -1,5 +1,5 @@
-const User = require("./User");
-const Friendship = require("./Friendship");
+const User = require("./userModel");
+const Friendship = require("./friendshipModel");
 
 // Define relationships
 User.belongsToMany(User, {

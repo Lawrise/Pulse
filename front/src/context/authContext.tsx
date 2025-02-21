@@ -1,6 +1,6 @@
 // src/contexts/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import apiAxios from '@/services/api';
+import React, { createContext, useContext, useState, useEffect } from "react";
+import apiAxios from "@/services/api";
 
 interface User {
   id: string;
@@ -18,7 +18,9 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -28,16 +30,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = async () => {
     try {
-      await apiAxios.post('/auth/logout', {}, { withCredentials: true });
+      await apiAxios.post("/auth/logout", {}, { withCredentials: true });
       setUser(null);
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
   const checkAuth = async () => {
     try {
-      const response = await apiAxios.get('/auth/profile', { withCredentials: true });
+      const response = await apiAxios.get("/auth/profile", {
+        withCredentials: true,
+      });
       if (response.data) {
         setUser(response.data);
       }
@@ -47,7 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setIsLoading(false);
     }
   };
-  
+
   useEffect(() => {
     checkAuth();
     console.log(user);
@@ -63,7 +67,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

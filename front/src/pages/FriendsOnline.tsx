@@ -10,7 +10,7 @@ type Friend = {
   email: string;
 };
 
-export default function FriendsAll() {
+export default function FriendsOnline() {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [error, setError] = useState<string | null>(null);
 

@@ -1,6 +1,5 @@
 import React from "react";
 import { UserRoundCheck } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { NavLink, Outlet } from "react-router-dom";
 
 const Friends: React.FC = () => {
@@ -23,7 +22,7 @@ const Friends: React.FC = () => {
             En ligne
           </NavLink>
           <NavLink
-            to="/friends/all"
+            to="/friends/"
             className={({ isActive }) =>
               `hover:bg-neutral-100 px-4 py-1 rounded-md ${
                 isActive ? "text-black bg-neutral-100" : ""

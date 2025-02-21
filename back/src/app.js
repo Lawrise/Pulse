@@ -5,6 +5,7 @@ const chatsRoutes = require("./routes/chat");
 const friendsRoutes = require("./routes/friends");
 
 const http = require("http");
+const { sequelize } = require('./config/db');
 const socketIo = require("socket.io");
 const cors = require("cors");
 
@@ -56,7 +57,7 @@ app.use("/auth", authRoutes);
 app.use("/conv", chatsRoutes);
 app.use("/friend", friendsRoutes);
 
-sequelize.sync().then(() => {
+sequelize.sync({ force: true }).then(() => {
   server.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
   });

@@ -20,10 +20,9 @@ import axios from "axios";
 import { useAuth } from "@/context/authContext";
 
 const formSchema = z.object({
-  email: z
+  identifiant: z
     .string()
-    .min(1, { message: "This field has to be filled." })
-    .email("This is not a valid email."),
+    .min(1, { message: "This field has to be filled." }),
   password: z
     .string()
 });
@@ -36,7 +35,7 @@ const Login: React.FC = () => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      email: "",
+      identifiant: "",
       password: "",
     },
   });
@@ -45,7 +44,7 @@ const Login: React.FC = () => {
     try {
       setIsLoading(true);
       const response = await apiAxios.post("/auth/login", {
-        email: values.email,
+        identifiant: values.identifiant,
         password: values.password,
       });
 
@@ -84,7 +83,7 @@ const Login: React.FC = () => {
           >
             <FormField
               control={form.control}
-              name="email"
+              name="identifiant"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Email</FormLabel>

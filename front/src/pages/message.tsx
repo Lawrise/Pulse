@@ -92,17 +92,21 @@ const MessageInterface = () => {
   };
 
   return (
-    <main className="w-full h-full flex">
+    <main className="w-full h-full flex p-4">
       <div className="w-1/4 border-r-2">
-        {chats.map((chat) => (
-          <div key={chat.chat_id} onClick={() => openChat(chat.chat_id)}>
-            <p>
-              <strong>Chat with User {chat.other_user_id}</strong>
-            </p>
-            <p>{chat.message || "No messages yet..."}</p>
-            <hr />
-          </div>
-        ))}
+        {chats.length === 0 ? (
+          <p>Pas de chat</p>
+        ) : (
+          chats.map((chat) => (
+            <div key={chat.chat_id} onClick={() => openChat(chat.chat_id)}>
+              <p>
+                <strong>Chat with User {chat.other_user_id}</strong>
+              </p>
+              <p>{chat.message || "No messages yet..."}</p>
+              <hr />
+            </div>
+          ))
+        )}
       </div>
       <div className="flex flex-col w-3/4">
         <ScrollArea className="h-[700px] w-full p-4">

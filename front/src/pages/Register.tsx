@@ -24,6 +24,9 @@ const formSchema = z
       .string()
       .min(1, { message: "This field has to be filled." })
       .email("This is not a valid email."),
+    username: z
+      .string()
+      .min(3, { message: "The username should have more than 3 letters"}),
     password: z
       .string()
       .min(8, { message: "Password must be at least 8 characters long." })
@@ -48,6 +51,7 @@ const Register: React.FC = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
+      username: "",
       password: "",
       confirm_password: "",
     },
@@ -58,6 +62,7 @@ const Register: React.FC = () => {
       setIsLoading(true);
       const response = await apiAxios.post("/auth/register", {
         email: values.email,
+        username: values.username,
         password: values.password,
       });
 
@@ -105,6 +110,22 @@ const Register: React.FC = () => {
                     <Input
                       type="email"
                       placeholder="john.doe@email.com"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="username"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="text"
                       {...field}
                     />
                   </FormControl>

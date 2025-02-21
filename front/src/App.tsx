@@ -10,6 +10,7 @@ import Profile from "@/pages/Profile";
 import Friends from "@/pages/Friends";
 import FriendsAll from "@/pages/FriendsAll";
 import FriendsPending from "@/pages/FriendsPending";
+import FriendsOnline from "@/pages/FriendsOnline";
 import FriendsAdd from "@/pages/FriendsAdd";
 
 const router = createBrowserRouter([
@@ -24,8 +25,8 @@ const router = createBrowserRouter([
         path: "friends",
         element: <Friends />,
         children: [
-          { path: "all", element: <FriendsAll /> },
-          { path: "online", element: <FriendsAll /> },
+          { index: true, element: <FriendsAll />, },
+          { path: "online", element: <FriendsOnline /> },
           { path: "pending", element: <FriendsPending /> },
           { path: "add", element: <FriendsAdd /> },
         ],
