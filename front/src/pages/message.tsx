@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useAuth } from "@/context/authContext";
 import { io, Socket } from "socket.io-client";
 import apiAxios from "@/services/api";
+import notificationSound from "@/assets/sukuna.mp3";
 
 interface Message {
   id: string;
@@ -40,10 +41,15 @@ const MessageInterface = () => {
   const searchParams = new URLSearchParams(window.location.search);
   const chatIdFromUrl = searchParams.get("chat");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+  useEffect(() => {
+    // Create audio element
+    audioRef.current = new Audio(notificationSound);
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
@@ -94,6 +100,12 @@ const MessageInterface = () => {
       setMessages((prev) => {
         // Only add message if it's not already in the list
         if (!prev.some((m) => m.id === message.id)) {
+          // Play sound if message is from someone else
+          if (message.sender_id !== user.id) {
+            audioRef.current
+              ?.play()
+              .catch((err) => console.error("Error playing sound:", err));
+          }
           return [...prev, message];
         }
         return prev;
@@ -151,7 +163,7 @@ const MessageInterface = () => {
   return (
     <main className="w-full h-full flex">
       {/* Chat list */}
-      <div className="w-1/4 border-r-2 p-4">
+      <div className="w-1/4 border-r-2 p-2">
         {chats.length === 0 ? (
           <p className="p-4 text-gray-500">No conversations yet</p>
         ) : (
@@ -160,16 +172,19 @@ const MessageInterface = () => {
               <div
                 key={chat.id}
                 onClick={() => openChat(chat.id)}
-                className={`p-4 hover:bg-gray-100 cursor-pointer ${
+                className={`flex space-x-1 p-2 hover:bg-gray-100 cursor-pointer ${
                   selectedChat === chat.id ? "bg-gray-100" : ""
                 }`}
               >
-                <p className="font-semibold">{chat.otherUser.username}</p>
-                {chat.lastMessageAt && (
-                  <p className="text-xs text-gray-500">
-                    {new Date(chat.lastMessageAt).toLocaleString()}
-                  </p>
-                )}
+                <div className="rounded-full w-12 h-12 bg-emerald-200"></div>
+                <div>
+                  <p className="font-semibold">{chat.otherUser.username}</p>
+                  {chat.lastMessageAt && (
+                    <p className="text-xs text-gray-500">
+                      {new Date(chat.lastMessageAt).toLocaleString()}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
