@@ -11,20 +11,22 @@ export const configureSocket = (server: HttpServer) => {
   });
 
   io.on("connection", (socket) => {
-    console.log("✅ User connected:", socket.id);
-
-    socket.on("send_message", (data) => {
-      console.log("📨 Message received:", data);
-      io.to(`chat_${data.chatId}`).emit("receive_message", data);
+    const userId = socket.handshake.auth.userId;
+    
+    socket.on("join_chat", (chatId) => {
+      const roomName = `chat_${chatId}`;
+      socket.join(roomName);
+      console.log(`User ${userId} joined chat room: ${roomName}`);
     });
 
-    socket.on("join_chat", (chatId) => {
-      socket.join(`chat_${chatId}`);
-      console.log(`👥 User joined chat room ${chatId}`);
+    socket.on("send_message", (message) => {
+      const roomName = `chat_${message.chat_id}`;
+      // Broadcast to all users in the chat room except sender
+      socket.to(roomName).emit("receive_message", message);
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ User disconnected");
+      console.log(`User ${userId} disconnected`);
     });
   });
 

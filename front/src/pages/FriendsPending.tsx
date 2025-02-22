@@ -6,7 +6,7 @@ import { Check, X } from "lucide-react";
 
 type FriendRequest = {
   id: number;
-  requester: {
+  user: {
     id: number;
     username: string;
     email: string;
@@ -43,7 +43,7 @@ export default function FriendsPending() {
 
   const onReject = async (requestId: number) => {
     try {
-      await apiAxios.post(`/friend/request/accept`, { requestId });
+      await apiAxios.post(`/friend/request/reject`, { requestId });
       setFriendRequests(friendRequests.filter((req) => req.id !== requestId));
     } catch (error) {
       console.error("Erreur lors du rejet :", error);
@@ -65,9 +65,9 @@ export default function FriendsPending() {
               className="border p-2 rounded flex justify-between items-center"
             >
               <div className="flex flex-col">
-                <p className="font-semibold">{request.requester.username}</p>
+                <p className="font-semibold">{request.user.username}</p>
                 <p className="text-sm text-gray-500">
-                  {request.requester.email}
+                  {request.user.email}
                 </p>
               </div>
               <div className="space-x-2">

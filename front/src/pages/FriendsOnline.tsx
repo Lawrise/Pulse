@@ -5,9 +5,12 @@ import { useEffect, useState } from "react";
 import { Send } from "lucide-react"
 
 type Friend = {
-  id: number;
-  username: string;
-  email: string;
+  friendshipId: string;
+  friend: {
+    id: string;
+    username: string;
+    email: string;
+  };
 };
 
 export default function FriendsOnline() {
@@ -40,14 +43,14 @@ export default function FriendsOnline() {
         <p>Aucun ami.</p>
       ) : (
         <ul className="space-y-2">
-          {friends.map((friend) => (
+          {friends.map((friendData) => (
             <li
-              key={friend.id}
+              key={friendData.friend.id}
               className="border p-2 rounded flex justify-between items-center"
             >
               <div className="flex flex-col">
-                <p className="font-semibold">{friend.username}</p>
-                <p className="text-sm text-gray-500">{friend.email}</p>
+                <p className="font-semibold">{friendData.friend.username}</p>
+                <p className="text-sm text-gray-500">{friendData.friend.email}</p>
               </div>
               <div>
                 <Button><Send />Message</Button>

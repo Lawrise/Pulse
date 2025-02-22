@@ -24,7 +24,7 @@ const items = [
   },
   {
     title: "Chat",
-    url: "/chat",
+    url: "/messages",
     icon: SendHorizontal,
   },
   {

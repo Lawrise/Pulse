@@ -3,6 +3,7 @@ import apiAxios from "@/services/api";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Send } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 type Friend = {
   friendshipId: string;
@@ -16,6 +17,7 @@ type Friend = {
 export default function FriendsAll() {
   const [friends, setFriends] = useState<Friend[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -33,6 +35,22 @@ export default function FriendsAll() {
 
     fetchFriends();
   }, []);
+
+  const startChat = async (friendId: string) => {
+    try {
+      // Create or get existing chat
+      const response = await apiAxios.post("/chats", {
+        user2Id: friendId
+      });
+      
+      // Navigate to messages page with the chat id
+      navigate(`/messages?chat=${response.data.id}`);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        setError(error.response?.data?.message || "Erreur lors de la création du chat");
+      }
+    }
+  };
 
   return (
     <div className="p-4">
@@ -55,7 +73,7 @@ export default function FriendsAll() {
                 </p>
               </div>
               <div>
-                <Button>
+                <Button onClick={() => startChat(friendData.friend.id)}>
                   <Send />
                   Message
                 </Button>

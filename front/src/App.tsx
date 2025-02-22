@@ -19,7 +19,7 @@ const router = createBrowserRouter([
     element: <Layout />,
     children: [
       { index: true, element: <Home /> },
-      { path: "chat", element: <MessageInterface /> },
+      { path: "messages", element: <MessageInterface /> },
       { path: "profile", element: <Profile /> },
       {
         path: "friends",
